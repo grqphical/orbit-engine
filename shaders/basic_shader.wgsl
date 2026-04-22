@@ -1,4 +1,3 @@
-shader_source = """
 struct VertexInput {
     @builtin(vertex_index) vertex_index : u32,
 };
@@ -31,4 +30,3 @@ fn fs_main(in: VertexOutput) -> @location(0) vec4<f32> {
     let physical_color = pow(in.color.rgb, vec3<f32>(2.2));  // gamma correct
     return vec4<f32>(physical_color, in.color.a);
 }
-"""

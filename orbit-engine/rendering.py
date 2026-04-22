@@ -1,9 +1,11 @@
 """
 Script responsible for the rendering of 3D objects using WGPU
 """
+
 from typing import Callable
-from .shaders.basic_shader import shader_source
+from .shader import Shader
 import wgpu
+
 
 def setup_drawing_sync(
     context, power_preference="high-performance", limits=None, format=None
@@ -23,27 +25,26 @@ def setup_drawing_sync(
     return get_draw_function(context, device, render_pipeline)
 
 
-
 def get_render_pipeline_kwargs(
-    context, device, render_texture_format
+    context, device: wgpu.GPUDevice, render_texture_format
 ) -> wgpu.RenderPipelineDescriptor:
     if render_texture_format is None:
         render_texture_format = context.get_preferred_format(device.adapter)
     context.configure(device=device, format=render_texture_format)
 
-    shader = device.create_shader_module(code=shader_source)
+    shader = Shader("shaders/basic_shader.wgsl", device)
     pipeline_layout = device.create_pipeline_layout(bind_group_layouts=[])
 
     return wgpu.RenderPipelineDescriptor(
         layout=pipeline_layout,
         vertex=wgpu.VertexState(
-            module=shader,
+            module=shader.shader,
             entry_point="vs_main",
         ),
         depth_stencil=None,
         multisample=None,
         fragment=wgpu.FragmentState(
-            module=shader,
+            module=shader.shader,
             entry_point="fs_main",
             targets=[
                 wgpu.ColorTargetState(
