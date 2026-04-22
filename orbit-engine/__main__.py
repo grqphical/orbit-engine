@@ -4,15 +4,14 @@ Orbit Engine
 
 import wgpu
 import logging
+from .shader import Shader
 from rendercanvas.auto import RenderCanvas, loop
 
 WIDTH, HEIGHT = 1280, 720
 
 
 def get_render_pipeline(canvas, device: wgpu.GPUDevice):
-    with open("shaders/basic_shader.wgsl", "r") as f:
-        shader_src = f.read()
-    shader = device.create_shader_module(code=shader_src)
+    shader = Shader("shaders/basic_shader.wgsl", device)
 
     pipeline_layout = device.create_pipeline_layout(bind_group_layouts=[])
 
@@ -23,7 +22,7 @@ def get_render_pipeline(canvas, device: wgpu.GPUDevice):
     return device.create_render_pipeline(
         layout=pipeline_layout,
         vertex={
-            "module": shader,
+            "module": shader.module,
             "entry_point": "vs_main",
         },
         primitive={
@@ -34,7 +33,7 @@ def get_render_pipeline(canvas, device: wgpu.GPUDevice):
         depth_stencil=None,
         multisample=None,
         fragment={
-            "module": shader,
+            "module": shader.module,
             "entry_point": "fs_main",
             "targets": [
                 {
